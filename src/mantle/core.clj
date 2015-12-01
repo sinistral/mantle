@@ -1,7 +1,7 @@
 
 (ns mantle.core
-  "In which is defined utility macros and functions that wrap the core Clojure
-  language to provide additional functionality or convenience.")
+  "In which is defined utility macros and functions that wrap the clojure.core
+  functions to provide additional functionality or convenience.")
 
 (defmacro returning
   "Takes a single binding, executes `forms` in the context of that
