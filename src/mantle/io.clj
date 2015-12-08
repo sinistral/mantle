@@ -11,3 +11,10 @@
   [cl-format]: https://clojure.github.io/clojure/clojure.pprint-api.html#clojure.pprint/cl-format"
   [writer format-in & args]
   `(cl-format ~writer ~format-in ~@args))
+
+(defn fmtstr
+  "Provides a marginally more convenient form of `clojure.pprint/cl-format` by
+  not requiring a writer to be specified when a formatted string is all that
+  is needed."
+  [format-in & args]
+  (format nil format-in args))
