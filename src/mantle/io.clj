@@ -17,4 +17,4 @@
   not requiring a writer to be specified when a formatted string is all that
   is needed."
   [format-in & args]
-  (format nil format-in args))
+  (apply cl-format (conj args format-in nil)))
