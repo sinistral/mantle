@@ -1,5 +1,5 @@
 
-(defproject sinistral/mantle "0.1.1"
+(defproject sinistral/mantle "0.1.2"
   :description "Extends the core Clojure library with additional utility or
   convenience functions."
   :url "https://github.com/sinistral/mantle"

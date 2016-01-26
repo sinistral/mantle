@@ -1,5 +1,6 @@
 
 (ns mantle.io-test
+  (:refer-clojure :exclude [format])
   (:require [clojure.test :refer :all]
             [mantle.core :refer [returning]]
             [mantle.io :refer :all])
