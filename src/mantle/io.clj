@@ -1,7 +1,7 @@
 
 (ns mantle.io
-  "In which is defined utility functions and macros that wrap the Clojure
-  I/O functions to provide additional functionality or convenience."
+  "In which are defined utility functions and macros that wrap the Clojure I/O
+  functions to provide additional functionality or convenience."
   (:refer-clojure :exclude [format])
   (:require [clojure.pprint :refer [cl-format]]))
 
