@@ -1,5 +1,5 @@
 
-(defproject sinistral/mantle "0.3.0-SNAPSHOT"
+(defproject sinistral/mantle "0.3.0"
   :description "Extends the core Clojure library with additional utility or convenience functions."
   :url "https://github.com/sinistral/mantle"
   :license {:name "Eclipse Public License"
