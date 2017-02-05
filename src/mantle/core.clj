@@ -4,6 +4,8 @@
   functions to provide additional functionality or convenience."
   (:refer-clojure :exclude [merge-with]))
 
+(def t true)
+
 (defn merge-with [f & opts-and-maps]
   "Like `clojure.core/merge-with`, but nested maps are merged
   recursively. `merge-with` has the following structure:
