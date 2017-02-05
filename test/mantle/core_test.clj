@@ -1,7 +1,32 @@
 
 (ns mantle.core-test
+  (:refer-clojure :exclude [merge-with])
   (:require [clojure.test :refer :all]
             [mantle.core :refer :all]))
+
+(defn merger
+  [& rest]
+  (last rest))
+
+(deftest test:merge-with
+  (testing "merges recursively when instructed to do so"
+    (let [inp (list {:a {:b {:c1 1}}} {:a {:b {:c2 2}}})
+          exp {:a {:b {:c1 1 :c2 2}}}
+          act (apply merge-with merger :recursively true inp)]
+      (is (= exp act))
+      (is (not (= act (apply clojure.core/merge-with merger inp))))))
+  (testing "merges like `clojure.core/merge-with` when instructed to do so"
+    (let [inp (list {:a {:b {:c1 1}}} {:a {:b {:c2 2}}})
+          exp {:a {:b {:c2 2}}}
+          act (apply merge-with merger :recursively nil inp)]
+      (is (= exp act))
+      (is (= act (apply clojure.core/merge-with merger inp)))))
+  (testing "merges like `clojure.core/merge-with` by default"
+    (let [inp (list {:a {:b {:c1 1}}} {:a {:b {:c2 2}}})
+          exp {:a {:b {:c2 2}}}
+          act (apply merge-with merger inp)]
+      (is (= exp act))
+      (is (= act (apply clojure.core/merge-with merger inp))))))
 
 (deftest test:returning
   (testing "standalone form"

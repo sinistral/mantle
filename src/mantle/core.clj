@@ -1,7 +1,37 @@
 
 (ns mantle.core
   "In which is defined utility macros and functions that wrap the clojure.core
-  functions to provide additional functionality or convenience.")
+  functions to provide additional functionality or convenience."
+  (:refer-clojure :exclude [merge-with]))
+
+(defn merge-with [f & opts-and-maps]
+  "Like `clojure.core/merge-with`, but nested maps are merged
+  recursively. `merge-with` has the following structure:
+
+  ```
+  (merge-with f options* maps+)
+  ```
+
+  Options are specified as pairs of keywords and values; currently
+  `:recursively` is the only supported option and its value is interpreted as
+  either truthy or falsey.  If omitted, behaviour is exactly as
+  `clojure.core/merge-with`.
+
+  For example: `(merge-with f :recursively true {:a {}} {:a {:b 0}})`"
+  ;; https://git.io/vDCeK by way of the now defunct clojure-contrib.
+  (letfn [(destructure-args [opts-and-maps]
+            (let [pairs       (partition-all 2 opts-and-maps)
+                  [opts maps] (split-with #(keyword? (first %)) pairs)]
+              [(into {} (map vec opts)) (reduce into [] maps)]))]
+    (let [[opts maps] (destructure-args opts-and-maps)]
+      (if (:recursively opts)
+        (apply
+         (fn m [& maps]
+           (if (every? map? maps)
+             (apply clojure.core/merge-with m maps)
+             (apply f maps)))
+         maps)
+        (apply clojure.core/merge-with f maps)))))
 
 (defmacro returning
   "Takes a single binding, executes `forms` in the context of that
