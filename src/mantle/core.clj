@@ -40,6 +40,7 @@
   binding, and returns `val`.  Although similar in spirit to `doto`,
   it allows for arbitrary forms to be evaluated before returning
   `val`, and is thus closer to Ruby's `tap`."
+  {:style/indent 1}
   [[var val] & body]
   `(let [~var ~val]
      ~@body
