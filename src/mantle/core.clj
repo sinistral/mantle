@@ -51,8 +51,8 @@
   `keyseq`. Values are returned in the order in which the keys are
   specified. `nil`s are included for keys not present in the map; use `(remove
   nil? (select-values ...))` to filter them out."
-  [map keyseq]
-  (reduce #(conj %1 (map %2)) [] keyseq))
+  [m keyseq]
+  (reduce #(conj %1 (get m %2)) [] keyseq))
 
 (defn single
   "Returns the only element of a collection, and throws an exception if there

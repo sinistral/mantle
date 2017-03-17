@@ -42,13 +42,24 @@
                (reset! y x))
              @y)))))
 
+(defrecord MapLikeThing
+    [a b c])
+
+(defn test-select-values-from-map
+  [[label m  & {:keys [key-fn] :or {key-fn identity}}]]
+  (testing label
+    (doseq [[exp key-seq] [[[3] [:c]]
+                           [[1 2] [:a :b]]
+                           [[2 1] [:b :a]]
+                           [[3 nil] [:c :d]]
+                           [[nil 3] [:d :c]]]]
+      (is (= exp (select-values m (map key-fn key-seq)))))))
+
 (deftest test:select-values
-  (let [m {:c 3 :a 1 :b 2}]
-    (is (= [3] (select-values m [:c])))
-    (is (= [1 2] (select-values m [:a :b])))
-    (is (= [2 1] (select-values m [:b :a])))
-    (is (= [3 nil] (select-values m [:c :d])))
-    (is (= [nil 3] (select-values m [:d :c])))))
+  (doseq [spec [["from map with keywords"    {:c 3 :a 1 :b 2}]
+                ["from map with string"      {"c" 3 "a" 1 "b" 2} :key-fn name]
+                ["from record with keywords" (->MapLikeThing 1 2 3)]]]
+    (test-select-values-from-map spec)))
 
 (deftest test:single
   (letfn [(test-single-modes [<1 =1 >1]
