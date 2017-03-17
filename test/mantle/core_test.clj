@@ -1,8 +1,18 @@
 
 (ns mantle.core-test
-  (:refer-clojure :exclude [merge-with])
+  (:refer-clojure :exclude [format merge-with])
   (:require [clojure.test :refer :all]
-            [mantle.core :refer :all]))
+            [mantle.core :refer :all])
+  (:import [java.io StringWriter]))
+
+(deftest test:format
+  (is (= ":foo" (format nil "~a" :foo)))
+  (is (= ":foo :bar" (format nil "~a ~a" :foo :bar)))
+  (is (= ":foo" (str (returning [w (StringWriter.)] (format w "~a" :foo))))))
+
+(deftest test:fmtstr
+  (is (= ":foo" (fmtstr "~a" :foo)))
+  (is (= ":foo :bar" (fmtstr "~a ~a" :foo :bar))))
 
 (defn merger
   [& rest]
