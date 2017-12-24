@@ -51,6 +51,12 @@
          maps)
         (apply clojure.core/merge-with f maps)))))
 
+(defn not-nil?
+  "Equivalent to `(not (nil? x))`, in a convenient form for use as a
+  predicate."
+  [x]
+  (not (nil? x)))
+
 (defmacro returning
   "Takes a single binding, executes `forms` in the context of that
   binding, and returns `val`.  Although similar in spirit to `doto`,

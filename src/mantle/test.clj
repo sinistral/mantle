@@ -2,8 +2,7 @@
 (ns mantle.test
   "In which is defined utility functions and macros that wrap clojure.test
   test functions to provide additional functionality or convenience."
-  (:require [mantle [core :refer [returning]]
-                    [io :as io]]))
+  (:require [mantle.core :refer [fmtstr returning]]))
 
 (defmacro defixture
   "Defines a fixture; that is: a context within which a test may be executed.
@@ -32,36 +31,45 @@
   [name spec]
   `(defn ~name
      []
-     {:setup (fn [] ~(:setup spec))
-      :binding '~(:binding spec)
-      :teardown (fn [] ~(:teardown spec))}))
+     {:setup      (fn [] ~(:setup spec))
+      :binding    '~(:binding spec)
+      :redefining '~(:redefining spec)
+      :teardown   (fn [] ~(:teardown spec))}))
 
-(defn ^{:private true} make-bindings
-  [bindings body]
-  (if (= (count bindings) 1)
-    `(binding ~(first bindings) ~body)
-    `(binding ~(first bindings)
-       ~(make-bindings (rest bindings) body))))
+(defn ^{:private true} wrap-in-bindings
+  [body bindings]
+  (cond (empty? bindings)
+        body
+        (= (count bindings) 1)
+        `(binding ~(first bindings) ~body)
+        :else
+        `(binding ~(first bindings)
+           ~(wrap-in-bindings body (rest bindings)))))
 
-(defn ^{:private true} make-body
-  [setup-spec body teardown-spec]
+(defn ^{:private true} wrap-in-setup-and-teardown
+  [body setup-spec teardown-spec]
   `(do (~setup-spec)
-       (try
-         (do ~@body)
-         (finally (~teardown-spec)))))
+       (let [x# (atom nil)]
+         (try
+           (swap! x# (fn [_#] (do ~@body)))
+           (finally (~teardown-spec)))
+         (deref x#))))
+
+(defn ^{:private true} wrap-in-redefs-fn
+  [body redefs-spec]
+  `(with-redefs-fn ~(or redefs-spec {})
+     (fn [] ~body)))
 
 (defmacro with-fixture
   "Execute the test body (which may consist of multiple forms) in the context
   of the named `fixture`."
   [fixture & body]
-  (let [{setup-spec :setup binding-spec :binding teardown-spec :teardown}
+  (let [{:keys [setup binding redefining teardown]
+         :or   {:binding [] :redefining {}}}
         (@(or (resolve fixture)
               (throw (RuntimeException.
-                      (io/format nil "Unknown fixture: ~a" fixture)))))
-        wrapped-body
-        (make-body setup-spec body teardown-spec)
-        bindings
-        (if binding-spec
-          (make-bindings binding-spec wrapped-body)
-          wrapped-body)]
-    bindings))
+                      (fmtstr nil "Unknown fixture: ~a" fixture)))))]
+    (-> body
+        (wrap-in-setup-and-teardown setup teardown)
+        (wrap-in-bindings binding)
+        (wrap-in-redefs-fn redefining))))
